@@ -3,8 +3,24 @@ Imports HBE_API_2013
 
 Public Class Form1
 
-    Private Class test
+    ''' <summary>
+    ''' Diese Klasse verwende ich, um einen Hintergrundporzess zu steuern
+    ''' Aktuell wurde testroutine über einen Timer aktiviert...
+    ''' Dies kann folgendermassen aussehen:
+    '''        ' jetzt sagen wir ihm, was er zu tun hat
+    '''        timerFeeder = New System.Timers.Timer()
+    '''
+    '''         AddHandler() timerFeeder.Elapsed, AddressOf testcl.testroutine
+    '''     timerFeeder.SynchronizingObject = Me
+    '''     timerFeeder.Interval = 1 * 1000
+    '''     timerFeeder.AutoReset = True
+    '''     timerFeeder.Start()
+    ''' 
+    ''' </summary>
+    Private Class rtbxInfos
 
+        ' ein RichTextBoxControl, damit ich Infos hineinschreiben kann
+        '
         Dim _ctrlInfo As clHbeControl
 
         Public zaehler As Integer = 1
@@ -13,6 +29,10 @@ Public Class Form1
             zaehler += 1
         End Sub
 
+        ''' <summary>
+        ''' Initilisierung
+        ''' </summary>
+        ''' <param name="ctrlinfo">RichTextBox um Infos hineinzuschreiben</param>
         Sub New(ctrlinfo As clHbeControl)
             _ctrlInfo = ctrlinfo
         End Sub
@@ -23,7 +43,9 @@ Public Class Form1
 
     Dim infoBox As clHbeControl
     Public timerFeeder As System.Timers.Timer
-    Private testcl As test
+    Private testcl As rtbxInfos
+    Dim StartPort As Integer = 54444
+    Dim AktPort As Integer = 0
 
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnExit.Click
@@ -35,7 +57,7 @@ Public Class Form1
         infoBox.SetText("Listener Programm gestartet")
 
         ' nun meine Testklasse einrichten
-        testcl = New test(infoBox)
+        testcl = New rtbxInfos(infoBox)
 
 
         ' Timer starten mit Testroutine
@@ -56,6 +78,20 @@ Public Class Form1
         Dim myThread As New Thread(AddressOf testcl.testroutine)
 
         myThread.Start()
+
+    End Sub
+
+    Private Sub btnStartListener_Click(sender As Object, e As EventArgs) Handles btnStartListener.Click
+        For i = 0 To 10
+            AktPort = StartPort + i
+            If isTcpPortAvailable(AktPort) Then
+
+                infoBox.AppendTextNL("Port: " & AktPort & " ist verfügbar!")
+                Exit For
+
+
+            End If
+        Next
 
     End Sub
 End Class
